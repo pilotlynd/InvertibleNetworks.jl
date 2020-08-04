@@ -5,10 +5,10 @@
 using LinearAlgebra, InvertibleNetworks, Test, Polynomials
 
 # Input
-nx = 28
-ny = 28
-n_in = 4
-n_hidden = 8
+nx = 32
+ny = 32
+n_in = 8
+n_hidden = 16
 batchsize = 2
 k1 = 3
 k2 = 3
@@ -25,11 +25,11 @@ W3 = glorot_uniform(k1, k1, 2*n_in, n_hidden)
 b1 = glorot_uniform(n_hidden)
 b2 = glorot_uniform(n_hidden)
 
-W01 = glorot_uniform(k1, k1, n_in, n_hidden)
-W02 = glorot_uniform(k2, k2, n_hidden, n_hidden)
-W03 = glorot_uniform(k1, k1, 2*n_in, n_hidden)
-b01 = glorot_uniform(n_hidden)
-b02 = glorot_uniform(n_hidden)
+W01 = randn(Float32, size(W1))
+W02 = randn(Float32, size(W2))
+W03 = randn(Float32, size(W3))
+b01 = randn(Float32, size(b1))
+b02 = randn(Float32, size(b2))
 
 dW1 = W1 - W01
 dW2 = W2 - W02
@@ -47,6 +47,7 @@ function loss(RB, X, Y; func=false)
     Y_ = RB.forward(X)
     ΔY = Y_ - Y
     f = .5f0*norm(ΔY)^2
+    # Don't compute grads if only need loss value
     if func
         return f
     else
@@ -94,7 +95,7 @@ for j=1:maxiter
     f = loss(RB0, X, Y; func=true)
     err3[j] = abs(f - f0)
     err4[j] = abs(f - f0 - h[j]*dot(dW1, ΔW1))
-    print(err3[j], "; ", h[j]*dot(dW1, ΔW1), "; ", err4[j], "\n")
+    print(err3[j], "; ", err4[j], "\n")
 end
 
 @show fit(log.(h), log.(err3), 1)
@@ -115,7 +116,7 @@ for j=1:maxiter
     f = loss(RB0, X, Y; func=true)
     err3[j] = abs(f - f0)
     err4[j] = abs(f - f0 - h[j]*dot(dW2, ΔW2))
-    print(err3[j], "; ", h[j]*dot(dW2, ΔW2), "; ", err4[j], "\n")
+    print(err3[j], "; ", err4[j], "\n")
 end
 
 @show fit(log.(h), log.(err3), 1)
@@ -136,7 +137,7 @@ for j=1:maxiter
     f = loss(RB0, X, Y; func=true)
     err3[j] = abs(f - f0)
     err4[j] = abs(f - f0 - h[j]*dot(dW3, ΔW3))
-    print(err3[j], "; ", h[j]*dot(dW3, ΔW3), "; ", err4[j], "\n")
+    print(err3[j], "; ", err4[j], "\n")
 end
 
 @show fit(log.(h), log.(err3), 1)

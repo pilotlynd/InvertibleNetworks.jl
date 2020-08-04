@@ -186,7 +186,7 @@ function forward(X1::AbstractArray{Float32, 4}, RB::ResidualBlock; save=false)
     X3 = ReLU(Y2)
     
     Y3 = ∇conv_data(X3, RB.W3.data, RB.cdims3)
-    RB.fan == true ? (X4 = ReLU(Y3)) : (X4 = GaLU(Y3))
+    RB.fan ? (X4 = ReLU(Y3)) : (X4 = GaLU(Y3))
 
     if save == false
         return X4
@@ -205,7 +205,7 @@ function forward(X1::AbstractArray{Float32, 5}, RB::ResidualBlock; save=false)
     X3 = ReLU(Y2)
     
     Y3 = ∇conv_data(X3, RB.W3.data, RB.cdims3)
-    RB.fan == true ? (X4 = ReLU(Y3)) : (X4 = GaLU(Y3))
+    RB.fan ? (X4 = ReLU(Y3)) : (X4 = GaLU(Y3))
 
     if save == false
         return X4
@@ -221,7 +221,7 @@ function backward(ΔX4::AbstractArray{Float32, 4}, X1::AbstractArray{Float32, 4}
     Y1, Y2, Y3, X2, X3 = forward(X1, RB; save=true)
 
     # Backpropagate residual ΔX4 and compute gradients
-    RB.fan == true ? (ΔY3 = ReLUgrad(ΔX4, Y3)) : (ΔY3 = GaLUgrad(ΔX4, Y3))
+    RB.fan ? (ΔY3 = ReLUgrad(ΔX4, Y3)) : (ΔY3 = GaLUgrad(ΔX4, Y3))
     ΔX3 = conv(ΔY3, RB.W3.data, RB.cdims3)
     ΔW3 = ∇conv_filter(ΔY3, X3, RB.cdims3)
 
@@ -252,7 +252,7 @@ function backward(ΔX4::AbstractArray{Float32, 5}, X1::AbstractArray{Float32, 5}
     Y1, Y2, Y3, X2, X3 = forward(X1, RB; save=true)
 
     # Backpropagate residual ΔX4 and compute gradients
-    RB.fan == true ? (ΔY3 = ReLUgrad(ΔX4, Y3)) : (ΔY3 = GaLUgrad(ΔX4, Y3))
+    RB.fan ? (ΔY3 = ReLUgrad(ΔX4, Y3)) : (ΔY3 = GaLUgrad(ΔX4, Y3))
     ΔX3 = conv(ΔY3, RB.W3.data, RB.cdims3)
     ΔW3 = ∇conv_filter(ΔY3, X3, RB.cdims3)
 
